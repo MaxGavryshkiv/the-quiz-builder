@@ -14,15 +14,20 @@ export default function QuizzesPage() {
   const [quizzes, setQuizzes] = useState<QuizListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const loadQuizzes = async () => {
+    try {
+      const data = await QuizService.getQuizzes();
+      setQuizzes(data);
+    } catch (error) {
+      console.error("Failed to load quizzes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadQuizzes();
   }, []);
-
-  const loadQuizzes = async () => {
-    const data = await QuizService.getQuizzes();
-    setQuizzes(data);
-    setLoading(false);
-  };
 
   const deleteQuiz = async (id: number) => {
     await QuizService.deleteQuiz(id);

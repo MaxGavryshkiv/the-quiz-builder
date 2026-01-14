@@ -1,10 +1,6 @@
-import { Quiz } from "@/types/quiz";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-export const QuizService = {
-  async createQuiz(data: Quiz) {
-    const res = await fetch(`${API_URL}/quizzes`, {
+export class QuizService {
+  static async createQuiz(data: any) {
+    const res = await fetch("http://localhost:3030/quizzes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -12,19 +8,25 @@ export const QuizService = {
 
     if (!res.ok) throw new Error("Failed to create quiz");
     return res.json();
-  },
+  }
 
-  async getQuizzes() {
-    const res = await fetch(`${API_URL}/quizzes`);
+  static async getQuizzes() {
+    const res = await fetch("http://localhost:3030/quizzes");
+    if (!res.ok) throw new Error("Failed to fetch quizzes");
     return res.json();
-  },
+  }
 
-  async getQuiz(id: string) {
-    const res = await fetch(`${API_URL}/quizzes/${id}`);
+  static async getQuizById(id: number) {
+    const res = await fetch(`http://localhost:3030/quizzes/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch quiz");
     return res.json();
-  },
+  }
 
-  async deleteQuiz(id: number) {
-    await fetch(`${API_URL}/quizzes/${id}`, { method: "DELETE" });
-  },
-};
+  static async deleteQuiz(id: number) {
+    const res = await fetch(`http://localhost:3030/quizzes/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete quiz");
+    return res.json();
+  }
+}
