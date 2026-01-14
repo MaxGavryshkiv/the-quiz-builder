@@ -1,0 +1,29 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Quiz {
+  id        Int        @id @default(autoincrement())
+  title     String
+  questions Question[]
+  createdAt DateTime   @default(now())
+}
+
+model Question {
+  id      Int     @id @default(autoincrement())
+  quizId  Int
+  quiz    Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  type    String  // замість enum
+  text    String
+
+  options String? // серіалізуємо JSON у рядок
+  answer  String? // серіалізуємо JSON у рядок або просто рядок
+
+  createdAt DateTime @default(now())
+}
