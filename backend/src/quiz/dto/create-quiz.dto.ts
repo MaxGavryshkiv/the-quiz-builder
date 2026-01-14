@@ -19,7 +19,7 @@ class CreateQuestionDto {
 
   @IsOptional()
   @IsString({ each: true })
-  options?: string[]; // будем серіалізувати в рядок
+  options?: string[];
 
   @IsOptional()
   answer?: boolean | string | string[];

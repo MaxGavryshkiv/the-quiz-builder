@@ -19,11 +19,11 @@ model Question {
   quizId  Int
   quiz    Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
-  type    String  // замість enum
+  type    String  
   text    String
 
-  options String? // серіалізуємо JSON у рядок
-  answer  String? // серіалізуємо JSON у рядок або просто рядок
+  options String?
+  answer  String? 
 
   createdAt DateTime @default(now())
 }

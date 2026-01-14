@@ -46,7 +46,6 @@ export class QuizService {
     });
     if (!quiz) throw new NotFoundException('Quiz not found');
 
-    // десеріалізуємо options і answer для зручності
     const questions = quiz.questions.map((q) => ({
       ...q,
       options: q.options ? JSON.parse(q.options) : undefined,
@@ -66,7 +65,7 @@ export class QuizService {
   }
 
   async remove(id: number) {
-    await this.findOne(id); // перевірка, що існує
+    await this.findOne(id);
     return this.prisma.quiz.delete({ where: { id } });
   }
 }
