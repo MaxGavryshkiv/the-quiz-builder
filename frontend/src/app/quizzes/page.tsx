@@ -1,73 +1,105 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { QuizService } from "@/services/quiz.service";
 
-interface QuizListItem {
+interface Quiz {
   id: number;
   title: string;
-  questionCount: number;
+  _count: { questions: number };
+  createdAt: string;
 }
 
 export default function QuizzesPage() {
-  const [quizzes, setQuizzes] = useState<QuizListItem[]>([]);
+  const router = useRouter();
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadQuizzes = async () => {
+  const fetchQuizzes = async () => {
     try {
       const data = await QuizService.getQuizzes();
       setQuizzes(data);
-    } catch (error) {
-      console.error("Failed to load quizzes:", error);
+    } catch (err) {
+      console.error("Failed to fetch quizzes", err);
+      alert("Failed to fetch quizzes");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadQuizzes();
-  }, []);
+  const handleDelete = async (id: number) => {
+    const confirmed = confirm("Are you sure you want to delete this quiz?");
+    if (!confirmed) return;
 
-  const deleteQuiz = async (id: number) => {
-    await QuizService.deleteQuiz(id);
-    setQuizzes((prev) => prev.filter((q) => q.id !== id));
+    try {
+      await QuizService.deleteQuiz(id);
+      setQuizzes((prev) => prev.filter((q) => q.id !== id));
+      alert("Quiz deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete quiz", err);
+      alert("Failed to delete quiz");
+    }
   };
 
-  if (loading) {
-    return <p className="p-6">Loading...</p>;
-  }
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">All Quizzes</h1>
+    <main className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+        All Quizzes
+      </h1>
 
-      {quizzes.length === 0 && <p className="text-gray-500">No quizzes yet</p>}
+      <button
+        onClick={() => router.push("/")}
+        className="mb-6 bg-gray-500 dark:bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-600 dark:hover:bg-gray-700"
+      >
+        Back to Home
+      </button>
 
-      <ul className="space-y-4">
-        {quizzes.map((quiz) => (
-          <li
-            key={quiz.id}
-            className="border p-4 flex justify-between items-center rounded"
+      <div className="grid gap-4">
+        {quizzes.length === 0 && (
+          <p className="text-gray-700 dark:text-gray-300">
+            No quizzes found. Create one first!
+          </p>
+        )}
+
+        {quizzes.map((q) => (
+          <div
+            key={q.id}
+            className="border rounded-lg p-4 shadow-sm transition-shadow
+                       bg-white dark:bg-gray-800
+                       text-gray-900 dark:text-gray-100
+                       hover:shadow-lg"
           >
-            <Link href={`/quizzes/${quiz.id}`} className="hover:underline">
-              <div>
-                <p className="font-semibold">{quiz.title}</p>
-                <p className="text-sm text-gray-500">
-                  Questions: {quiz.questionCount}
-                </p>
-              </div>
-            </Link>
+            <h2 className="text-xl font-semibold mb-2">{q.title}</h2>
+            <p className="text-sm mb-1">
+              Questions:{" "}
+              <span className="font-medium">{q._count.questions}</span>
+            </p>
 
-            <button
-              onClick={() => deleteQuiz(quiz.id)}
-              className="text-red-600 hover:underline"
-            >
-              Delete
-            </button>
-          </li>
+            <div className="flex gap-2 flex-wrap mt-2">
+              <button
+                onClick={() => router.push(`/quizzes/${q.id}`)}
+                className="bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                View
+              </button>
+
+              <button
+                onClick={() => handleDelete(q.id)}
+                className="bg-red-500 dark:bg-red-600 text-white px-3 py-1 rounded hover:bg-red-600 dark:hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </main>
   );
 }
