@@ -33,7 +33,7 @@ Backend runs at http://localhost:3000.
 ### 3. Create sample quiz
 
 1. Open the frontend in your browser:
-   http://localhost:3000/create-quiz
+   http://localhost:3000/create
 
 2. Enter a **Quiz Title** in the input field.
 
